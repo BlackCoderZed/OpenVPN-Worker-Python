@@ -6,14 +6,36 @@ import os
 #########################################################################################
 
 class KeyInfo:
-    def __init__(self, TicketId, KeyName, Email):
+    def __init__(self, TicketId, KeyName, Password, Email):
         self.TicketId = TicketId
         self.KeyName = KeyName
         self.Email = Email
+        self.Password = Password
     
     def GenerateKey(self):
-        cmdStr = 'sudo ./home/ubuntu/OpenVPN-Worker-POC-Python/itsolution-openvpn.sh {}'.format(self.KeyName)
-        os.system(cmdStr)
+        cmdStr = 'tail -n +2 /etc/openvpn/easy-rsa/pki/index.txt | grep -c -E "/CN='+self.KeyName+'\\$"
+        existKey = os.system(cmdStr)
+        if len(existKey) > 0:
+            print('Already exist')
+            sys.exit()
+        if self.Password == '':
+            cmdStr = './etc/openvpn/easy-rsa/easyrsa build-client-full {} nopass'.format(self.KeyName)
+            os.system(cmdStr)
+            print('Client Added')
+
+        #Determine tls-crypt or tls-auth
+        cmdStr = 'grep "tls-crypt" /etc/openvpn/server.conf'
+        encTypeCrypt = os.system(cmdStr)
+        if len(encTypeCrypt) > 0
+            TLS_SIG = 1
+        else :
+            TLS_SIG = 2
+
+        # Generates the custom client.ovpn
+        homeDir = '/home/ubuntu/'
+        cert_str = '<ca>'
+        cert_str += os.system('cat /etc/openvpn/easy-rsa/pki/ca.crt')
+        cert_str += '</ca>'
 
     def SendMail(self):
         print('...Sending...')
