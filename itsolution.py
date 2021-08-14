@@ -12,7 +12,8 @@ class KeyInfo:
         self.Email = Email
     
     def GenerateKey(self):
-        os.system('sudo ./openvpn.sh '+self.KeyName)
+        cmdStr = 'sudo ./home/ubuntu/OpenVPN-Worker-POC-Python/itsolution-openvpn.sh {}'.format(self.KeyName)
+        os.system(cmdStr)
 
     def SendMail(self):
         print('...Sending...')
