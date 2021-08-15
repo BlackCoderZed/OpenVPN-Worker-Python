@@ -50,8 +50,8 @@ def UpdateTicketInfo(ticketInfo):
     cnxn = pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};SERVER='+server+';DATABASE='+database+';UID='+username+';PWD='+ password)
     cursor = cnxn.cursor()
 
-    query = "update Instructions Set InstructionStatusID = 2 where TicketID = "+ tickerInfo.TicketId +";"
-    curosr.execute(query)
+    query = "update Instructions Set InstructionStatusID = 2 where TicketID = "+ str(ticketInfo.TicketId) +";"
+    cursor.execute(query)
     print('Updated')
 
 def GenerateKey(keyInfo):
@@ -150,7 +150,7 @@ def GetTlsCrypt():
 
 def GetTlsAuth():
     with open('/etc/openvpn/tls-auth.key','r') as f:
-        retunr f.read()
+        return f.read()
 
 def SendMail(ticketInfo):
     print('...Sending...')
