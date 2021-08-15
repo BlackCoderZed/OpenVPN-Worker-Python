@@ -42,7 +42,16 @@ def GetTicketInfo(serverId):
 
     return ticketInfoLst
 
-def UpdateTicketInfo():
+def UpdateTicketInfo(ticketInfo):
+    server = 'tcp:13.231.65.63' 
+    database = 'It-Solution-OpenVPN' 
+    username = 'sa' 
+    password = 'Superm@n' 
+    cnxn = pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};SERVER='+server+';DATABASE='+database+';UID='+username+';PWD='+ password)
+    cursor = cnxn.cursor()
+
+    query = "update Instructions Set InstructionStatusID = 2 where TicketID = "+ tickerInfo.TicketId +";"
+    curosr.execute(query)
     print('Updated')
 
 def GenerateKey(keyInfo):
@@ -50,7 +59,7 @@ def GenerateKey(keyInfo):
     #existKey = os.system(cmdStr)
     #Check Key is already exist
     existKey = CheckExist(keyInfo.KeyName)
-    if existKey == true:
+    if existKey == True:
         print('Already exist')
         return
     
@@ -60,29 +69,29 @@ def GenerateKey(keyInfo):
         print('Key Register Process Result : '+str(result))
 
     #Determine Encryption Method
-    TLS_SIG = GetEncrytionType()
+    TLS_SIG = GetEncryptionType()
 
     # Generates the custom client.ovpn
     homeDir = '/home/ubuntu/'
-    cert_str = GetTemplate
+    cert_str = str(GetTemplate())
     
     cert_str += '<ca>\n'
-    cert_str += GetCaInfo()
+    cert_str += str(GetCaInfo())
     cert_str += '</ca>\n'
     cert_str += '<cert>\n'
-    cert_str += GetCertInfo(keyInfo.KeyName)
+    cert_str += str(GetCertInfo(keyInfo.KeyName))
     cert_str += '</cert>\n'
     cert_str += '<key>\n'
-    cert_str += GetKeyInfo(keyInfo.KeyName)
+    cert_str += str(GetKeyInfo(keyInfo.KeyName))
     cert_str += '</key>\n'
 
     if TLS_SIG == 1:
         cert_str += '<tls-crypt>\n'
-        cert_str += GetTlsCrypt()
+        cert_str += str(GetTlsCrypt())
         cert_str += '</tls-crypt>\n'
     else :
         cert_str += '<tls-auth>\n'
-        cert_str += GetTlsAuth()
+        cert_str += str(GetTlsAuth())
         cert_str += '</tls-auth>\n'
 
     #create file
@@ -95,9 +104,9 @@ def CheckExist(keyName):
     with open('pki/index.txt','r') as f:
         logstr = f.read()
         if keyName in logstr:
-            return true
+            return True
         else:
-            return false
+            return False
 
 def GetEncryptionType():
     with open('/etc/openvpn/server.conf', 'r') as f:
@@ -116,24 +125,24 @@ def GetCaInfo():
         return f.read()
 
 def GetCertInfo(keyName):
-    fileName = '/etc/openvpn/easy-rsa/pki/issued/'+keyName
+    fileName = '/etc/openvpn/easy-rsa/pki/issued/'+keyName+'.crt'
     with open(fileName,'r') as f:
         lines = f.readlines()
         cert = ''
-        startRead = false
+        startRead = False
         for line in lines:
             if 'BEGIN' in line:
-                startRead = true
-            if startRead == true:
+                startRead = True
+            if startRead == True:
                 cert += line
-            if 'END' in lines:
-                startRead = false
+            if 'END' in line:
+                startRead = False
         return cert
 
 def GetKeyInfo(keyName):
-    filename = '/etc/openvpn/easy-rsa/pki/private/'+keyName
+    filename = '/etc/openvpn/easy-rsa/pki/private/'+keyName+'.key'
     with open(filename,'r') as f:
-        return f.open()
+        return f.read()
 
 def GetTlsCrypt():
     with open('/etc/openvpn/tls-crypt.key','r') as f:
@@ -154,5 +163,6 @@ print(len(GetTicketInfo(SERVER_ID)))
 ticketInfoLst = GetTicketInfo(SERVER_ID)
 for ticketInfo in ticketInfoLst:
     GenerateKey(ticketInfo)
-    UpdateTicketInfo()
+    UpdateTicketInfo(ticketInfo)
     SendMail(ticketInfo)
+
