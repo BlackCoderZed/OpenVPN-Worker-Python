@@ -175,12 +175,13 @@ def GetTlsAuth():
 
 def SendMail(ticketInfo):
     print('...Sending...')
-    subject = "OpenVPN"
-    body = "Automated email"
+    subject = "OpenVPN by IT-Solution"
+    body = "Thanks for choosing IT-Solution.\n***Automated email***"
     sender_email = "blackcoder.zed@gmail.com"
     receiver_email = ticketInfo.Email
     filename = HOME_DIR + ticketInfo.KeyName + '.ovpn'
     password = 'Password'
+    attachName = filename + '.ovpn'
 
     # Create a multipart message and set headers
     message = MIMEMultipart()
@@ -190,7 +191,7 @@ def SendMail(ticketInfo):
     message["Bcc"] = receiver_email
 
     # Add body to email
-    message.attach(MIMEText(body, "plain"))
+    message.attach(body, "plain"))
 
     with open(filename, "rb") as attachment:
         part = MIMEBase("application", "octet-stream")
@@ -201,7 +202,7 @@ def SendMail(ticketInfo):
     # Add header as key/value pair to attachment part
     part.add_header(
                 "Content-Disposition",
-                f"attachment; filename= {filename}",
+                f"attachment; filename= {attachName}",
     )
 
     # Add attachment to message and convert message to string
@@ -222,3 +223,4 @@ def SendMail(ticketInfo):
 SERVER_ID = str(102)
 HOME_DIR = '/home/ubuntu/client/'
 NewTicket(SERVER_ID)
+
