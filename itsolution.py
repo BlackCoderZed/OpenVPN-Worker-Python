@@ -191,7 +191,7 @@ def SendMail(ticketInfo):
     message["Bcc"] = receiver_email
 
     # Add body to email
-    message.attach(body, "plain"))
+    message.attach(MIMEText(body, "plain"))
 
     with open(filename, "rb") as attachment:
         part = MIMEBase("application", "octet-stream")
