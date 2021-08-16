@@ -1,5 +1,10 @@
 import pyodbc
 import os
+import email, smtplib, ssl
+from email import encoders
+from email.mime.base import MIMEBase
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 
 #########################################################################################
 #                                  KeyInfo Class                                        #
@@ -15,6 +20,10 @@ class KeyInfo:
 #########################################################################################
 #                                  Methods                                              #
 #########################################################################################
+
+########################
+#      New Ticket      #
+########################
 
 def GetTicketInfo(serverId):
     ticketInfoLst = []
@@ -39,8 +48,17 @@ def GetTicketInfo(serverId):
         email = result[3]
         kInfo = KeyInfo(ticketId, keyName, '', email)
         ticketInfoLst.append(kInfo)
+    cursor.close()
+    cnxn.close()
 
     return ticketInfoLst
+
+def NewTicket(ServerID):
+    ticketInfoLst = GetTicketInfo(ServerID)
+    for ticketInfo in ticketInfoLst:
+          GenerateKey(ticketInfo)
+          UpdateTicketInfo(ticketInfo)
+          SendMail(ticketInfo)
 
 def UpdateTicketInfo(ticketInfo):
     server = 'tcp:13.231.65.63' 
@@ -52,6 +70,9 @@ def UpdateTicketInfo(ticketInfo):
 
     query = "update Instructions Set InstructionStatusID = 2 where TicketID = "+ str(ticketInfo.TicketId) +";"
     cursor.execute(query)
+    cursor.commit()
+    cursor.close()
+    cnxn.close()
     print('Updated')
 
 def GenerateKey(keyInfo):
@@ -72,7 +93,7 @@ def GenerateKey(keyInfo):
     TLS_SIG = GetEncryptionType()
 
     # Generates the custom client.ovpn
-    homeDir = '/home/ubuntu/'
+    homeDir = HOME_DIR
     cert_str = str(GetTemplate())
     
     cert_str += '<ca>\n'
@@ -154,15 +175,50 @@ def GetTlsAuth():
 
 def SendMail(ticketInfo):
     print('...Sending...')
+    subject = "OpenVPN"
+    body = "Automated email"
+    sender_email = "blackcoder.zed@gmail.com"
+    receiver_email = ticketInfo.Email
+    filename = HOME_DIR + ticketInfo.KeyName + '.ovpn'
+    password = 'Password'
+
+    # Create a multipart message and set headers
+    message = MIMEMultipart()
+    message["From"] = sender_email
+    message["To"] = receiver_email
+    message["Subject"] = subject
+    message["Bcc"] = receiver_email
+
+    # Add body to email
+    message.attach(MIMEText(body, "plain"))
+
+    with open(filename, "rb") as attachment:
+        part = MIMEBase("application", "octet-stream")
+        part.set_payload(attachment.read())
+
+    encoders.encode_base64(part)
+
+    # Add header as key/value pair to attachment part
+    part.add_header(
+                "Content-Disposition",
+                f"attachment; filename= {filename}",
+    )
+
+    # Add attachment to message and convert message to string
+    message.attach(part)
+    text = message.as_string()
+
+    # Log in to server using secure context and send email
+    context = ssl.create_default_context()
+    with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
+        server.login(sender_email, password)
+        server.sendmail(sender_email, receiver_email, text)
+    print('Send...')
+    
 
 #########################################################################################
 #                                  Entry Point                                          #
 #########################################################################################
 SERVER_ID = str(102)
-print(len(GetTicketInfo(SERVER_ID)))
-ticketInfoLst = GetTicketInfo(SERVER_ID)
-for ticketInfo in ticketInfoLst:
-    GenerateKey(ticketInfo)
-    UpdateTicketInfo(ticketInfo)
-    SendMail(ticketInfo)
-
+HOME_DIR = '/home/ubuntu/client/'
+NewTicket(SERVER_ID)
