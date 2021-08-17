@@ -181,7 +181,7 @@ def SendMail(ticketInfo):
     receiver_email = ticketInfo.Email
     filename = HOME_DIR + ticketInfo.KeyName + '.ovpn'
     password = 'Password'
-    attachName = filename + '.ovpn'
+    attachName = ticketInfo.KeyName + '.ovpn'
 
     # Create a multipart message and set headers
     message = MIMEMultipart()
