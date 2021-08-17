@@ -36,7 +36,7 @@ def GetTicketInfo(serverId):
 
     query = """select Inst.TicketID,Inst.CommandCode,KeyInfo.Name as [KeyName],Cust.EmailAddress as [Emai] from Instructions as Inst
         inner join KeyInformations as KeyInfo on Inst.KeyInfoId = KeyInfo.Id inner join Customers as Cust on KeyInfo.CustomerID = Cust.CustomerId 
-        where Inst.InstructionStatusID = 1 and Inst.ServerID = """+serverId+""";"""
+        where Inst.CommandCode = 101 and Inst.InstructionStatusID = 1 and Inst.ServerID = """+serverId+""";"""
 
 
     cursor.execute(query)
