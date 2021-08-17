@@ -15,11 +15,23 @@ class KeyInfo:
 #########################################################################################
 #                                  Methods                                              #
 #########################################################################################
-def DeleteClient():
+def DeleteClient(ServerID):
     ticketInfoLst = GetTicketInfo(ServerID)
     for ticketInfo in ticketInfoLst:
-        cmd = './easy-rsa --batch revoke ' + ticketInfo.KeyName
+        cmd = './easyrsa --batch revoke ' + ticketInfo.KeyName
         os.system(cmd)
+
+        cmd2 = 'EASYRSA_CRL_DAYS=3650 ./easyrsa gen-crl'
+        os.system(cmd2)
+
+        cmd3 = 'rm -f /etc/openvpn/crl.pem'
+        os.system(cmd3)
+
+        cmd4 = 'cp /etc/openvpn/easy-rsa/pki/crl.pem /etc/openvpn/crl.pem'
+        os.system(cmd4)
+
+        cmd5 = 'chmod 644 /etc/openvpn/crl.pem'
+        os.system(cmd5)
         print('Deleted')
 
 def GetTicketInfo(serverId):
@@ -54,5 +66,6 @@ def GetTicketInfo(serverId):
 #                                  Entry Point                                          #
 #########################################################################################
 
-SERVER_ID = str(102)
+SERVER_ID = str(105)
 HOME_DIR = '/home/ubuntu/client/'
+DeleteClient(SERVER_ID)
