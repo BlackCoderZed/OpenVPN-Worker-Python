@@ -32,7 +32,24 @@ def DeleteClient(ServerID):
 
         cmd5 = 'chmod 644 /etc/openvpn/crl.pem'
         os.system(cmd5)
+
+        UpdateTicketInfo(ticketInfo)
         print('Deleted')
+
+def UpdateTicketInfo(ticketInfo):
+    server = 'tcp:13.231.65.63' 
+    database = 'It-Solution-OpenVPN' 
+    username = 'sa' 
+    password = 'Superm@n' 
+    cnxn = pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};SERVER='+server+';DATABASE='+database+';UID='+username+';PWD='+ password)
+    cursor = cnxn.cursor()
+
+    query = "update Instructions Set InstructionStatusID = 2 where TicketID = "+ str(ticketInfo.TicketId) +";"
+    cursor.execute(query)
+    cursor.commit()
+    cursor.close()
+    cnxn.close()
+    print('Updated')
 
 def GetTicketInfo(serverId):
     ticketInfoLst = []
