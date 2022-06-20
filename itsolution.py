@@ -164,7 +164,7 @@ def SendMail(ticketInfo):
     print('...Sending...')
     subject = "OpenVPN by IT-Solution"
     body = "Thanks for choosing IT-Solution.\n***Automated email***"
-    sender_email = "blackcoder.zed@gmail.com"
+    sender_email = "admin@itsolutionmm.xyz"
     receiver_email = ticketInfo.Email
     filename = HOME_DIR + ticketInfo.KeyName + '.ovpn'
     password = 'Password'
@@ -198,7 +198,7 @@ def SendMail(ticketInfo):
 
     # Log in to server using secure context and send email
     context = ssl.create_default_context()
-    with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
+    with smtplib.SMTP_SSL("smtp.titan.email", 465, context=context) as server:
         server.login(sender_email, password)
         server.sendmail(sender_email, receiver_email, text)
     print('Send...')
