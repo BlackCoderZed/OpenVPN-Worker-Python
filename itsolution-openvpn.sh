@@ -1,4 +1,3 @@
-cd /etc/openvpn/easy-rsa/
+cd /etc/openvpn/easy-rsa
 
-sudo python3 itsolution.py
-sudo python3 itsolution-delete.py
+python3 openvpn-worker.py

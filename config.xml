@@ -1,0 +1,10 @@
+<config>
+	<ServerId>132</ServerId>
+	<ServerIP>18.139.18.18</ServerIP>
+	<SecretKey>-</SecretKey>
+	<EmailAddress>admin@itsolutionmm.xyz</EmailAddress>
+	<Password>-</Password>
+	<SmtpAddress>smtp.titan.email</SmtpAddress>
+	<IpPrefix>192.168.42.</IpPrefix>
+	<SaveDir>/home/ubuntu/client/</SaveDir>
+</config>
