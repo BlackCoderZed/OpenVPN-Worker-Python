@@ -7,6 +7,7 @@ from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from pathlib import Path
+from email.utils import formataddr
 
 #########################################################################################
 #                                  Configuartion Class                                        #
@@ -220,7 +221,7 @@ def SendMail(ticketInfo):
 
     # Create a multipart message and set headers
     message = MIMEMultipart()
-    message["From"] = sender_email
+    message["From"] = formataddr((SENDER_NAME, sender_email))
     message["To"] = receiver_email
     message["Subject"] = subject
     message["Bcc"] = receiver_email
@@ -259,6 +260,7 @@ config = Configuration.LoadConfiguration()
 SERVER_ID = config.ServerId
 SERVER_IP = config.ServerIP
 SECRET_KEY = config.SecretKey
+SENDER_NAME = "IT-Solution"
 EMAIL_ADDRESS = config.EmailAddress
 EMAIL_PASSWORD = config.Password
 SMTP_ADDRESS = config.SmtpServer
