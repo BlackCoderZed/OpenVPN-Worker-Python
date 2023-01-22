@@ -121,7 +121,7 @@ def GenerateKey(keyInfo):
         return
     
     if keyInfo.Password == '':
-        cmdStr = './easyrsa build-client-full {} nopass'.format(keyInfo.KeyName)
+        cmdStr = './easyrsa --batch build-client-full {} nopass'.format(keyInfo.KeyName)
         result = os.system(cmdStr)
         print('Key Register Process Result : '+str(result))
 
