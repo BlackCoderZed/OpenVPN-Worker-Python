@@ -247,8 +247,8 @@ def SendMail(ticketInfo):
 
     # Log in to server using secure context and send email
     context = ssl.create_default_context()
-    with smtplib.SMTP(SMTP_ADDRESS, 587) as server:
-        server.starttls(context=context)
+    with smtplib.SMTP_SSL(SMTP_ADDRESS, 465, context=context) as server:
+        #server.starttls(context=context)
         server.login(sender_email, password)
         server.sendmail(sender_email, receiver_email, text)
     print('Send...')
