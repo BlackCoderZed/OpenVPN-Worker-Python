@@ -65,7 +65,8 @@ def StartRegistrationProcess():
     for ticketInfo in ticketInfoLst:
           GenerateKey(ticketInfo)
           UpdateTicketInfo(ticketInfo)
-          SendMail(ticketInfo)
+          #SendMail(ticketInfo)
+          SendKey(ticketInfo)
 
 def StartDeleteProcess():
     ticketInfoLst = GetTicketInfo(DELETE_REQ_INFO)
@@ -209,6 +210,22 @@ def GetTlsAuth():
     with open('/etc/openvpn/tls-auth.key','r') as f:
         return f.read()
 
+def ReadKey(kname):
+    keyFile = HOME_DIR + kname + '.ovpn'
+    with open(keyFile, 'r') as f:
+        return f.read()
+    
+        
+def SendKey(ticketInfo):
+    print('Sending...')
+    authInfo = AUTH_INFO
+    keycontent = ReadKey(ticketInfo.KeyName)
+    emailSendInfo = {'ServerID' : SERVER_ID, 'Email': ticketInfo.Email, 'KeyContent' :  keycontent, 'KeyName' : ticketInfo.KeyName + '.ovpn'}
+    wsdl = API_URL
+    client = Client(wsdl)
+    result = client.service.SendKey(authInfo, emailSendInfo)
+    print('Complete...')
+
 def SendMail(ticketInfo):
     print('...Sending...')
     subject = "OpenVPN by IT-Solution"
@@ -247,8 +264,7 @@ def SendMail(ticketInfo):
 
     # Log in to server using secure context and send email
     context = ssl.create_default_context()
-    with smtplib.SMTP(SMTP_ADDRESS, 587) as server:
-        server.starttls(context=context)
+    with smtplib.SMTP_SSL(SMTP_ADDRESS, 465, context=context) as server:
         server.login(sender_email, password)
         server.sendmail(sender_email, receiver_email, text)
     print('Send...')
